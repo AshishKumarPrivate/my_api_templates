@@ -1,23 +1,54 @@
 
+import 'package:flutter/cupertino.dart';
+
+import '../model/login_model.dart';
 import '../model/single_message_model.dart';
 import '../model/tech_add_new_devices_model.dart';
 import '../model/tech_all_devices_list_model.dart';
 import '../model/tech_update_devices_model.dart';
 import '../model/vendor_categories_list_model.dart';
+import '../utils/storage_util.dart';
 import 'api_response.dart';
 import 'dio_helper.dart';
 
 class Repository {
   final DioHelper _dioHelper = DioHelper();
 
-  static const String technologybaseUrl =  'https://dss-backend-qnvh.onrender.com/api/v1';
+  static const String baseURL = 'https://dss-backend-qnvh.onrender.com/api/v1';
 
-  Future<ApiResponse<TechAllDevicesListModelResponse>> getAllTechDevicesList(Map<String, dynamic> queryParameters) async {
-    final String url = "$technologybaseUrl/tech/network-infrastructure/get";
+
+  Future<ApiResponse<LoginResponseModel>> loginUser(
+      Map<String, dynamic> requestBody,) async {
+    final String url = "$baseURL/login/email/password";
+
+    try {
+      final response = await _dioHelper.post<Map<String, dynamic>>(
+        url: url,
+        requestBody: requestBody,
+        // isAuthRequired: false,
+      );
+      if (response.success && response.data != null) {
+        return ApiResponse.success(LoginResponseModel.fromJson(response.data!));
+      } else {
+        return ApiResponse.error(
+          response.message ?? "Unknown error",
+          statusCode: response.statusCode,
+          data: null,
+        );
+      }
+    } catch (e) {
+      return ApiResponse.error("Login failed: ${e.toString()}");
+    }
+  }
+
+  Future<ApiResponse<TechAllDevicesListModelResponse>> getAllTechDevicesList(
+      Map<String, dynamic> queryParameters) async {
+    final String url = "$baseURL/tech/network-infrastructure/get";
     // final String url = "$baseUrl/api/v1/sales/all/employee";
 
     try {
-      final response = await _dioHelper.get<Map<String, dynamic>>(url: url,queryParams: queryParameters);
+      final response = await _dioHelper.get<Map<String, dynamic>>(
+          url: url, queryParams: queryParameters);
       if (response.success && response.data != null) {
         return ApiResponse.success(
           TechAllDevicesListModelResponse.fromJson(response.data!),
@@ -35,10 +66,9 @@ class Repository {
   }
 
   Future<ApiResponse<TechAddNewDeviceModelResponse>> addNewTechDevice(
-      Map<String, dynamic> requestBody
-      ) async {
+      Map<String, dynamic> requestBody) async {
     // final String url = "$baseUrl/api/v1/sales/tl-report/create/${salesTlId}";
-    final String url = "$technologybaseUrl/tech/network-infrastructure/add";
+    final String url = "$baseURL/tech/network-infrastructure/add";
 
 
     try {
@@ -65,10 +95,9 @@ class Repository {
 
   Future<ApiResponse<TechUpdateDeviceModelResponse>> updateTechDevice(
       Map<String, dynamic> requestBody,
-      String networkDevicesID
-      ) async {
+      String networkDevicesID) async {
     // final String url = "$baseUrl/api/v1/sales/tl-report/create/${salesTlId}";
-    final String url = "$technologybaseUrl/tech/network-infrastructure/update/${networkDevicesID}";
+    final String url = "$baseURL/tech/network-infrastructure/update/${networkDevicesID}";
 
 
     try {
@@ -93,10 +122,9 @@ class Repository {
   }
 
   Future<ApiResponse<SingleMessageModelResponse>> deleteTechDevice(
-      String networkDevicesID
-      ) async {
+      String networkDevicesID) async {
     // final String url = "$baseUrl/api/v1/sales/tl-report/create/${salesTlId}";
-    final String url = "$technologybaseUrl/tech/network-infrastructure/delete/${networkDevicesID}";
+    final String url = "$baseURL/tech/network-infrastructure/delete/${networkDevicesID}";
 
 
     try {
@@ -119,9 +147,9 @@ class Repository {
     }
   }
 
-
-  Future<ApiResponse<VendorCategoryListModelResponse>> getAllVendorCategoryList() async {
-    final String url = "$technologybaseUrl/vendor/get-categories";
+  Future<ApiResponse<
+      VendorCategoryListModelResponse>> getAllVendorCategoryList() async {
+    final String url = "$baseURL/vendor/get-categories";
     // final String url = "$baseUrl/api/v1/sales/all/employee";
 
     try {

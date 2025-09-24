@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:my_api_templates/screen/list_screen.dart';
+import 'package:my_api_templates/screen/update_device_screen.dart';
 import '../../../../network_manager/api_response.dart';
+import '../model/login_model.dart';
 import '../model/single_message_model.dart';
 import '../model/tech_add_new_devices_model.dart';
 import '../model/tech_all_devices_list_model.dart';
@@ -12,8 +15,10 @@ class ApiProvider with ChangeNotifier {
   final Repository _repository = Repository();
 
   bool _isLoading = false;
-
   bool get isLoading => _isLoading;
+
+  ApiResponse<LoginResponseModel>? _loginResponse;
+  ApiResponse<LoginResponseModel>? get loginResponse => _loginResponse;
 
   ApiResponse<TechAllDevicesListModelResponse>? _getAllTechDeviceListModelResponse;
   ApiResponse<TechAllDevicesListModelResponse>? get getAllTechDeviceListModelResponse => _getAllTechDeviceListModelResponse;
@@ -183,4 +188,58 @@ class ApiProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+
+  Future<void> login(BuildContext context,Map<String, dynamic> body) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final response = await _repository.loginUser(body);
+      _loginResponse = response;
+
+      if (response.success && response.data != null) {
+        await _saveUserData(response.data);
+        final message = response.data!.message!.isNotEmpty == true ? response.data!.message!  : "Login successful!";
+
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => CategoryListScreen()
+          ),
+        );
+
+      } else {
+        debugPrint("Login failed: ${response.message}");
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(response.message.toString())));
+      }
+    } catch (e, stackTrace) {
+      debugPrint("Login Exception: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+
+
+  }
+
+  Future<void> _saveUserData(LoginResponseModel? loginResponseModel) async {
+
+    if(loginResponseModel?.data !=null){
+      final loginUserId = loginResponseModel?.data?.allData?.sId ?? "NA";
+      final name = loginResponseModel?.data?.allData?.name ?? "NA";
+      await StorageHelper().setLoginUserId(loginUserId);
+      await StorageHelper().setLoginUserName(name);
+       await StorageHelper().setBoolIsLoggedIn(true);
+    }
+
+  }
+
+
+
 }
