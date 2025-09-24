@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
+import 'package:my_api_templates/screen/update_device_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:testing_project/demo/screen/update_device_screen.dart';
 
 import '../controller/api_provider.dart';
 import '../model/tech_all_devices_list_model.dart';

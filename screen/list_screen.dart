@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:my_api_templates/model/vendor_categories_list_model.dart';
 import 'package:provider/provider.dart';
-import 'package:testing_project/demo/model/vendor_categories_list_model.dart';
 
 import '../controller/api_provider.dart';
+import 'category_detail_screen.dart';
 
 class CategoryListScreen extends StatefulWidget {
   const CategoryListScreen({Key? key}) : super(key: key);
@@ -172,6 +173,12 @@ class _CategoryListScreenState extends State<CategoryListScreen>
         onTap: () {
           print("Selected ${category.categoryName}");
           // Add your navigation or detail screen logic here
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CategoryDetailScreen(category: category),
+            ),
+          );
         },
         borderRadius: BorderRadius.circular(12),
         child: Container(
