@@ -1,16 +1,67 @@
 import 'package:flutter/material.dart';
-import 'package:my_api_templates/controller/api_provider.dart';
-import 'package:my_api_templates/model/vendor_categories_list_model.dart';
 import 'package:provider/provider.dart';
+import 'package:testing_project/demo/model/vendor_categories_list_model.dart';
 
-class CategoryListScreen extends StatelessWidget {
+import '../controller/api_provider.dart';
+
+class CategoryListScreen extends StatefulWidget {
   const CategoryListScreen({Key? key}) : super(key: key);
+
+  @override
+  State<CategoryListScreen> createState() => _CategoryListScreenState();
+}
+
+class _CategoryListScreenState extends State<CategoryListScreen>
+    with TickerProviderStateMixin {
+  final TextEditingController _searchController = TextEditingController();
+  late AnimationController _animationController;
+
+  String _searchQuery = '';
+  Data? _selectedCategory;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _searchController.addListener(_onSearchChanged);
+
+    // Fetch categories when screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchCategories();
+    });
+  }
+
+  void _fetchCategories() {
+    final provider = Provider.of<ApiProvider>(context, listen: false);
+    provider.getAllVendorCategoryList(context).then((_) {
+      final categoryData =
+          provider.getVendorCategoryListModelResponse?.data?.data;
+      if (categoryData != null && categoryData.isNotEmpty) {
+        setState(() {
+          _selectedCategory = categoryData[0]; // default selected
+        });
+      }
+    });
+  }
+
+  void _onSearchChanged() {
+    setState(() {
+      _searchQuery = _searchController.text.toLowerCase();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Categories'), centerTitle: true),
-      body: Column(children: [_buildDropdown(), _buildCategoryGridSection()]),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [_buildDropdown(), _buildCategoryGridSection()],
+        ),
+      ),
     );
   }
 
@@ -29,12 +80,14 @@ class CategoryListScreen extends StatelessWidget {
               : (categoryData?.data == null || categoryData!.data!.isEmpty)
               ? Center(child: Text("No categories found.")) // 2. No data state
               : DropdownButton<Data>(
-                  value: categoryData.data![0],
+                  value: _selectedCategory,
                   isExpanded: true,
                   icon: const Icon(Icons.arrow_drop_down),
                   underline: const SizedBox(),
                   onChanged: (Data? newValue) {
-                    // Handle the selected value here
+                    setState(() {
+                      _selectedCategory = newValue;
+                    });
                     print('Selected category: ${newValue?.categoryName}');
                   },
                   items: categoryData.data!.map<DropdownMenuItem<Data>>((
@@ -125,11 +178,11 @@ class CategoryListScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.2),
-            image: const DecorationImage(
-              image: AssetImage('assets/images/img_pattern2.jpg'),
-              fit: BoxFit.cover,
-              opacity: 0.4,
-            ),
+            // image: const DecorationImage(
+            //   image: AssetImage('assets/images/img_pattern2.jpg'),
+            //   fit: BoxFit.cover,
+            //   opacity: 0.4,
+            // ),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(

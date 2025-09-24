@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:my_api_templates/controller/api_provider.dart';
 import 'package:provider/provider.dart' show Consumer;
 
+import '../controller/api_provider.dart';
 import '../model/tech_all_devices_list_model.dart';
 
 class UpdateDeviceScreen extends StatefulWidget {

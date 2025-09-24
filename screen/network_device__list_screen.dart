@@ -1,11 +1,12 @@
 
 import 'package:flutter/material.dart';
-import 'package:my_api_templates/controller/api_provider.dart';
-import 'package:my_api_templates/screen/update_device_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:testing_project/demo/screen/update_device_screen.dart';
 
+import '../controller/api_provider.dart';
 import '../model/tech_all_devices_list_model.dart';
 import 'add_new_device_screen.dart';
+
 class TechDevicesListScreen extends StatefulWidget {
   const TechDevicesListScreen({Key? key}) : super(key: key);
 

@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:my_api_templates/screen/list_screen.dart';
-import 'package:my_api_templates/screen/update_device_screen.dart';
-import '../../../../network_manager/api_response.dart';
 import '../model/login_model.dart';
 import '../model/single_message_model.dart';
 import '../model/tech_add_new_devices_model.dart';
 import '../model/tech_all_devices_list_model.dart';
 import '../model/tech_update_devices_model.dart';
 import '../model/vendor_categories_list_model.dart';
+import '../network_manager/api_response.dart';
 import '../network_manager/repository.dart';
+import '../screen/list_screen.dart' show CategoryListScreen;
 import '../utils/storage_util.dart';
 
 class ApiProvider with ChangeNotifier {
@@ -237,6 +236,16 @@ class ApiProvider with ChangeNotifier {
       await StorageHelper().setLoginUserName(name);
        await StorageHelper().setBoolIsLoggedIn(true);
     }
+
+    void logoutUser(BuildContext context) {
+      StorageHelper().logout();
+      // Navigator.of(context).pushAndRemoveUntil(
+      //   MaterialPageRoute(builder: (context) => MainRoleSelectionScreen()),
+      //       (route) => false,
+      // );
+      // });
+    }
+
 
   }
 

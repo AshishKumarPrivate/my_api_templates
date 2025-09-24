@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:my_api_templates/network_manager/print_value_utild.dart';
+import 'package:testing_project/demo/network_manager/print_value_utild.dart';
 
 
 Dio getDio () {
